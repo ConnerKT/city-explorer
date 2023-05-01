@@ -4,7 +4,8 @@ import Button from 'react-bootstrap/Button';
 function CityForm() {
    function handleSubmit(event){
     event.preventDefault();
-    
+    fetch('https://us1.locationiq.com/v1/search.php')
+
    }
     return(
         <>
