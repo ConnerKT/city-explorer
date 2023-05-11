@@ -4,6 +4,8 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card'
 import axios from 'axios';
 import { useState } from 'react';
+import Weather from "../Weather";
+import Error from "../Error";
 
 
 
@@ -19,7 +21,8 @@ function CityForm() {
         longitude:''
     });
     // This state sets the image state we get from the server for the map image
-    const [image, setImage] = useState('')
+    const [image, setImage] = useState('');
+    const [weather, setWeather] = useState([])
  
     // This is an async function that grabs from our key, with the search state, and formats it to json
     const getLocation = async () => {
@@ -30,6 +33,12 @@ function CityForm() {
         let apiGet = `https://us1.locationiq.com/v1/search?key=${process.env.REACT_APP_API_KEY}&q=${search}&format=json`
             // stores that data in response
         let response = await axios.get(apiGet);
+
+        //make a new request to my server 
+        let apiServer = `http://localhost:3001/weather?searchQuery=${search}&format=json`
+        let responseServer = await axios.get(apiServer)
+        setWeather(responseServer.data)
+
         //we set the variable for the datas first obj, which is the first match for our query
         let searchLocation = response.data[0];
         // We set the states for all of our states, so the data can be contained
@@ -42,20 +51,24 @@ function CityForm() {
         let imageUrl =`https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_API_KEY}&center=${searchLocation.lat},${searchLocation.lon}&format=jpg&zoom=15`
         //We are setting the image url into the sate
         setImage(imageUrl)
-        console.log(imageUrl)
         // this is our exception for the errors, if there is any (404 etc)
     }catch(error){
         console.log("You ran into an error, try again later")
         // we set the state for location so we can have error to appear
+        
+        
         setState({
             location: "ERROR"
         })
+        return( <Error/>
+        )
     }
     }
     //This is our function to handle the submit , and run the function we have above, it also prevents the refresh
    function handleSubmit(event){
         event.preventDefault();
         getLocation();
+        
    }
  // this is our return, which basically renders everything in our page
     return(
@@ -77,9 +90,27 @@ function CityForm() {
                 <Card.Img id='cardImg'src={image}></Card.Img>
             </Card.Body>
         </Card>
+       {
+        weather.map(element => {
+            return(
+            <Weather
+            cityname={element.cityname}
+            day={element.day}
+            lat={element.lat}
+            lon={element.lon}
+            lowtemp={element.lowtemp}
+            hightemp={element.hightemp}
+            description={element.description}
+            date={element.date}
+            ></Weather>
+            )
+        })
+       }
+
         </>
        
     )
+    
    
 }
 
