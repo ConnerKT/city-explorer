@@ -66,6 +66,7 @@ function CityForm() {
         )
     }
     }
+    // This is my async function that grabs data from the URI to return the data to use
     const movieFunction = async () => {
         let movieApi = `https://city-explorer-api-vq9n.onrender.com/movies?movieQuery=${search}`
         let movieResponse = await axios.get(movieApi)
@@ -100,6 +101,7 @@ function CityForm() {
             </Card.Body>
         </Card>
        {
+        //This is my map function so I can render on my page my weather component
         weather.map(element => {
             return(
             <Weather
@@ -116,6 +118,7 @@ function CityForm() {
         })
        }
        {
+        // This is my map function so I can render my movie component 
         movieData.map(element => {
             return(
                 <Movies
