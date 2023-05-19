@@ -6,6 +6,7 @@ import axios from 'axios';
 import { useState } from 'react';
 import Weather from "../Weather";
 import Error from "../Error";
+import Movies from "../Movies";
 
 
 
@@ -20,10 +21,13 @@ function CityForm() {
         latitude:'',
         longitude:''
     });
+    // This is an array state, so we can store our new data in it from our backend
+    const [movieData, setMovieData] = useState([]);
+    console.log(movieData)
     // This state sets the image state we get from the server for the map image
     const [image, setImage] = useState('');
     const [weather, setWeather] = useState([])
- 
+    
     // This is an async function that grabs from our key, with the search state, and formats it to json
     const getLocation = async () => {
         //I have a mechanism to handle errors in my code with 'try' and 'catch'
@@ -55,8 +59,6 @@ function CityForm() {
     }catch(error){
         console.log("You ran into an error, try again later")
         // we set the state for location so we can have error to appear
-        
-        
         setState({
             location: "ERROR"
         })
@@ -64,10 +66,17 @@ function CityForm() {
         )
     }
     }
+    const movieFunction = async () => {
+        let movieApi = `https://city-explorer-api-vq9n.onrender.com/movies?movieQuery=${search}`
+        let movieResponse = await axios.get(movieApi)
+        setMovieData(movieResponse.data)
+        
+    }
     //This is our function to handle the submit , and run the function we have above, it also prevents the refresh
    function handleSubmit(event){
         event.preventDefault();
         getLocation();
+        movieFunction();
         
    }
  // this is our return, which basically renders everything in our page
@@ -106,7 +115,19 @@ function CityForm() {
             )
         })
        }
-
+       {
+        movieData.map(element => {
+            return(
+                <Movies
+                title={element.title}
+                overview={element.overview}
+                poster_path={element.poster_path}
+                release_date={element.release_date}
+                >
+                </Movies>
+            )
+        })
+       }
         </>
        
     )
